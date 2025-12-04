@@ -35,10 +35,10 @@ Keep marketing content, plan data, and Stripe price IDs in sync to avoid checkou
 
 ```mermaid
 flowchart TD
-    A[Client UI (marketing/auth/dashboard)] --> B[Next.js App Router]
-    B --> C[API routes & server actions]
-    C -->|Service role| D[Supabase DB & Storage]
-    C -->|Stripe SDK| E[Stripe Checkout & Portal]
+    A[Client UI (marketing · auth · dashboard)] --> B[Next.js App Router]
+    B --> C[API routes and server actions]
+    C -->|Service role| D[Supabase DB and Storage]
+    C -->|Stripe SDK| E[Stripe Checkout and Portal]
     C -->|HTTP| F[Resend Emails]
     C -->|HTTP| G[GitHub API]
     B --> H[PostHog Client]
