@@ -1,0 +1,172 @@
+---
+title: What to Customize
+description: A clear guide on which files to change and which to leave alone.
+---
+
+## What to Customize
+
+This is your cheat sheet. It tells you exactly what to change to make KwikSaaS yours, and what you should leave untouched.
+
+---
+
+## ✅ You MUST Change These
+
+These files contain placeholder branding that you need to replace with your own.
+
+| File | What to Change | Priority |
+| --- | --- | --- |
+| `src/lib/seo/config.ts` | Site name, tagline, URL, company info, social links | 🔴 Required |
+| `src/config/site.config.ts` | Site metadata and company details | 🔴 Required |
+| `.env.local` | Your Supabase, Stripe, and Resend API keys | 🔴 Required |
+| `public/logos/logo.svg` | Replace with your logo | 🔴 Required |
+| `src/content/legal/*.mdx` | Privacy policy, Terms of Service | 🔴 Required |
+
+<Warning>
+  **Don't launch without updating these files.** They contain demo branding and placeholder legal text.
+</Warning>
+
+---
+
+## 🎨 CUSTOMIZE These (Your Content)
+
+Update these to match your product and marketing.
+
+| File/Folder | What's There | What to Do |
+| --- | --- | --- |
+| `src/config/marketing.config.ts` | Hero text, features, FAQ, testimonials | Edit with your copy |
+| `src/app/(marketing)/sections/` | Landing page sections | Customize or replace |
+| `src/content/blog/` | Demo blog posts | Delete demos, add your posts |
+| `src/content/changelog/` | Demo changelog entries | Delete demos, add your own |
+| `public/logos/logo-dark.svg` | Dark mode logo | Replace if needed |
+| `src/app/globals.css` | Theme colors (CSS variables) | Match your brand colors |
+| `src/components/shared/logo.tsx` | Logo component | Update with your SVG |
+
+<Tip>
+  **Pro tip:** Start with `marketing.config.ts` — it controls most of the landing page content from one file.
+</Tip>
+
+---
+
+## ⚠️ MODIFY with Care
+
+These control core functionality. Change them, but understand what you're changing.
+
+| File | What It Does | When to Change |
+| --- | --- | --- |
+| `src/lib/payments/plans.ts` | Pricing plans and Stripe price IDs | When setting up your pricing |
+| `src/config/plans.config.ts` | Plan definitions for access gating | When changing plan features |
+| `src/components/shared/header.tsx` | Navigation links | When adding/removing nav items |
+| `src/components/shared/footer.tsx` | Footer links and info | When updating footer |
+| `src/components/dashboard/app-sidebar.tsx` | Dashboard navigation | When adding dashboard pages |
+
+<Warning>
+  **Keep plans in sync.** If you change `plans.ts`, make sure `plans.config.ts` and your Stripe products match.
+</Warning>
+
+---
+
+## 🚫 DON'T Touch These
+
+Leave these alone unless you're an experienced developer making intentional changes.
+
+| Folder/File | Why Not to Touch |
+| --- | --- |
+| `src/lib/supabase/` | Core Supabase client factories — they work |
+| `src/lib/payments/stripe.ts` | Stripe integration — tested and working |
+| `src/lib/access.ts` | Access control logic — handles subscriptions |
+| `src/lib/email/` | Email sending — integrated with Resend |
+| `src/components/ui/` | shadcn/radix UI components — don't modify |
+| `src/app/api/` | API routes (checkout, webhooks, etc.) — working |
+| `src/app/(auth)/actions.ts` | Auth server actions — leave as-is |
+| `src/lib/supabase/middleware.ts` | Route protection — critical for security |
+| `supabase/migrations/` | Database schema — don't edit existing files |
+
+<Info>
+  These are the "boilerplate" parts. They're designed to just work. Focus your energy on the customization files above.
+</Info>
+
+---
+
+## 5-Minute Customization Checklist
+
+New to KwikSaaS? Follow this order:
+
+<Steps>
+<Step title="Update site config (2 min)">
+Edit `src/lib/seo/config.ts`:
+```typescript
+export const siteConfig = {
+  name: "Your Product Name",
+  tagline: "Your catchy tagline",
+  url: "https://yourdomain.com",
+  company: {
+    name: "Your Company Inc.",
+    email: "hello@yourdomain.com",
+  },
+};
+```
+</Step>
+
+<Step title="Replace logo (1 min)">
+Drop your logo SVG into `public/logos/logo.svg`
+</Step>
+
+<Step title="Update hero text (2 min)">
+Edit `src/config/marketing.config.ts`:
+```typescript
+export const heroContent = {
+  headline: "Your Amazing Product {flip}",
+  flipWords: ["Fast", "Beautiful", "Powerful"],
+  description: "What your product does in one sentence.",
+};
+```
+</Step>
+</Steps>
+
+<Check>
+  **Done!** You now have a customized landing page. Deploy it or keep customizing.
+</Check>
+
+---
+
+## File Locations At a Glance
+
+```
+src/
+├── lib/seo/config.ts          ← ✅ Update this first
+├── config/
+│   ├── site.config.ts         ← ✅ Site metadata
+│   ├── marketing.config.ts    ← 🎨 Landing page content
+│   └── plans.config.ts        ← ⚠️ Plan definitions
+├── content/
+│   ├── blog/                  ← 🎨 Your blog posts
+│   ├── changelog/             ← 🎨 Your changelog
+│   └── legal/                 ← ✅ Your legal pages
+├── components/
+│   ├── shared/                ← 🎨 Header, footer, logo
+│   ├── dashboard/             ← ⚠️ Dashboard UI
+│   └── ui/                    ← 🚫 Don't touch
+├── lib/
+│   ├── supabase/              ← 🚫 Don't touch
+│   ├── payments/plans.ts      ← ⚠️ Pricing config
+│   └── access.ts              ← 🚫 Don't touch
+└── app/
+    ├── api/                   ← 🚫 Don't touch
+    └── (marketing)/sections/  ← 🎨 Landing sections
+
+public/
+└── logos/                     ← ✅ Your brand logos
+```
+
+---
+
+## Need More Details?
+
+<CardGroup cols={2}>
+  <Card title="Full Customization Guide" icon="palette" href="/customization">
+    Deep dive into theming, colors, and components
+  </Card>
+  <Card title="Payments Setup" icon="credit-card" href="/payments">
+    Configure Stripe products and plans
+  </Card>
+</CardGroup>

@@ -1,0 +1,149 @@
+---
+title: Getting Started
+description: Get KwikSaaS running in 5 minutes with minimal setup.
+---
+
+## Get Running in 5 Minutes
+
+This is the fastest path to seeing KwikSaaS in action. You only need **Supabase** to start — Stripe and Resend can be added later.
+
+<Info>
+  **TL;DR:** Clone → Set 3 env vars → Run. That's it.
+</Info>
+
+---
+
+## Prerequisites
+
+<CardGroup cols={2}>
+  <Card title="Node.js 18+" icon="node-js">
+    Check: `node -v`. [Download](https://nodejs.org/) if needed.
+  </Card>
+  <Card title="Supabase Account" icon="database">
+    Free tier works perfectly. [Create account →](https://supabase.com)
+  </Card>
+</CardGroup>
+
+---
+
+## Step 1: Clone & Install
+
+```bash
+git clone https://github.com/MohammedAlhawamdeh/kwiksaas.git
+cd kwiksaas
+npm install
+```
+
+<Check>
+  Takes about 1-2 minutes depending on your connection.
+</Check>
+
+---
+
+## Step 2: Create Supabase Project
+
+<Steps>
+<Step title="Create project">
+1. Go to [supabase.com/dashboard](https://supabase.com/dashboard)
+2. Click **New Project**
+3. Pick a name, set a password, choose a region
+4. Wait ~2 minutes for it to spin up
+</Step>
+
+<Step title="Copy your keys">
+Go to **Settings → API** and grab these 3 values:
+
+| What to copy | Where to paste |
+| --- | --- |
+| Project URL | `NEXT_PUBLIC_SUPABASE_URL` |
+| `anon` public key | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` |
+| `service_role` secret | `SUPABASE_SECRET_KEY` |
+</Step>
+
+<Step title="Configure auth redirects">
+Go to **Authentication → URL Configuration**:
+
+- **Site URL:** `http://localhost:3000`
+- **Redirect URLs:** Add `http://localhost:3000/auth/callback`
+</Step>
+
+<Step title="Run database migration">
+Option A (Recommended):
+```bash
+npx supabase link --project-ref YOUR_PROJECT_REF
+npx supabase db push
+```
+
+Option B (Manual):
+Copy contents of `supabase/migrations/*.sql` and run in Supabase SQL Editor.
+</Step>
+</Steps>
+
+---
+
+## Step 3: Set Environment Variables
+
+```bash
+cp .env.example .env.local
+```
+
+Open `.env.local` and fill in the 3 Supabase values you copied:
+
+```bash
+# Required - Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=eyJ...
+SUPABASE_SECRET_KEY=eyJ...
+
+# Required - Site URL
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# Everything else is optional for now!
+```
+
+<Tip>
+  **Stripe and Resend are optional.** The app works without them — you just won't have payments or custom emails yet.
+</Tip>
+
+---
+
+## Step 4: Run It!
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) 🎉
+
+---
+
+## Verify It's Working
+
+| Test | How |
+| --- | --- |
+| Homepage loads | Visit `/` — you should see the landing page |
+| Auth works | Go to `/sign-up`, create an account |
+| Dashboard works | After signing in, you land on `/dashboard` |
+
+<Check>
+  **You're done!** The app is running with full auth. Time to make it yours.
+</Check>
+
+---
+
+## What's Next?
+
+<CardGroup cols={2}>
+  <Card title="What to Customize" icon="palette" href="/what-to-customize">
+    See exactly which files to change (and which to leave alone)
+  </Card>
+  <Card title="Add Payments" icon="credit-card" href="/payments">
+    Connect Stripe when you're ready for billing
+  </Card>
+  <Card title="Full Quickstart" icon="rocket" href="/quickstart">
+    Complete setup with Stripe, Resend, and PostHog
+  </Card>
+  <Card title="Deploy" icon="cloud" href="/deployment">
+    Push to production on Vercel
+  </Card>
+</CardGroup>
