@@ -17,6 +17,8 @@
             "group": "Getting Started",
             "pages": [
               "index",
+              "getting-started",
+              "what-to-customize",
               "quickstart",
               "authentication",
               "payments",
