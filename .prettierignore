@@ -1,0 +1,2 @@
+# Ignore all MDX files to prevent Prettier from breaking JSX closing tag indentation
+*.mdx
