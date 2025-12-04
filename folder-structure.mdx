@@ -1,0 +1,41 @@
+---
+title: Folder Structure
+description: Key directories and how they map to features.
+---
+
+## Folder Structure
+
+- `src/app/` — App Router routes.
+  - `(marketing)/sections` — Landing sections (hero, tech stack, pricing, social proof, FAQ, CTA).
+  - `(auth)` — Sign-in/up/confirm/reset flows; server actions for auth.
+  - `(dashboard)` — Protected dashboard pages; server actions for profile/billing.
+  - `(legal)` — Terms, privacy, cookie policy pages (MDX content in `src/content/legal`).
+  - `api/` — Route handlers: checkout, portal, webhooks, download, GitHub access, OG images.
+  - `blog/` — Blog listing + post renderer using MDX content.
+  - `changelog/` — Changelog pages from MDX.
+  - `error.tsx`, `global-error.tsx`, `not-found.tsx` — Error boundaries.
+- `src/components/`
+  - `marketing/` — Prop-driven marketing blocks.
+  - `dashboard/` — Dashboard shell, tables, charts, nav, notifications.
+  - `auth/` — Auth layout, OAuth buttons, update password.
+  - `demo/` — Component showcases.
+  - `emails/` — React Email templates (magic link, confirm, reset, purchase).
+  - `shared/` — Header, footer, logo, breadcrumbs, theme toggles.
+  - `ui/` — shadcn/radix primitives and custom animations/backgrounds.
+- `src/lib/`
+  - `supabase/` — client/server/admin factories, middleware.
+  - `payments/` — Stripe client, plan config, helpers.
+  - `email/` — Resend senders for auth + purchase.
+  - `access.ts` — Access/feature gating across one-time + subscriptions.
+  - `license.ts` — License key generation/validation/download logging.
+  - `github.ts` — Collaborator invites/status.
+  - `rate-limit.ts` — In-memory rate limiting presets.
+  - `seo/` — Config, metadata helpers, JSON-LD.
+  - `posthog/` — Client/server helpers; server exports in `index.ts`.
+  - `validations/` — Zod schemas for auth/API.
+  - `errors.ts` — Safe error sanitization for API responses.
+- `src/config/` — Product/marketing content: site config, marketing hero/pricing/FAQ, plan definitions.
+- `src/content/` — MDX: blog posts, changelog entries, legal docs.
+- `supabase/migrations/` — SQL for billing tables, license keys, GitHub username column.
+- `public/` — Static assets, manifest, icons, brand logos used by docs and OG.
+- `docs/` — Additional text guides; Mintlify project lives in `docs/mintlify/`.

@@ -1,0 +1,73 @@
+---
+title: User Flows
+description: End-to-end experiences for signup, purchase, download, and GitHub access.
+---
+
+## User Flows
+
+### Signup / signin
+
+<Steps>
+<Step title="Start auth">
+Open `/sign-up` or `/sign-in`.
+</Step>
+<Step title="Choose method">
+Use OAuth buttons (Google/GitHub) or email/password via server actions.
+</Step>
+<Step title="Handle email links">
+Magic link and reset emails are sent via Resend from `lib/email/auth.ts`.
+</Step>
+<Step title="Finalize session">
+`/auth/callback` exchanges tokens, enforces recovery for reset flows, and redirects to the dashboard or `next`.
+</Step>
+</Steps>
+
+### Purchase (subscription or lifetime)
+
+<Steps>
+<Step title="Start checkout">
+Click a pricing CTA to POST `/api/checkout_sessions` with `priceId`.
+</Step>
+<Step title="Pay in Stripe">
+Stripe Checkout collects payment; metadata carries `user_id` (if logged in) and plan info.
+</Step>
+<Step title="Sync records">
+Webhook writes subscription or one-time purchase to Supabase, tracks PostHog events, and may email a license key.
+</Step>
+<Step title="Manage billing">
+Use `/api/customer_portal` (GET/POST) to open Stripe Portal.
+</Step>
+</Steps>
+
+### Download access
+
+<Steps>
+<Step title="Request download">
+Authenticated user hits `/api/download` (optional `version` query).
+</Step>
+<Step title="Validate license">
+Endpoint checks active license; Standard is blocked from `version=latest`.
+</Step>
+<Step title="Get signed URL">
+Returns signed Storage URL, logs download history, and increments count.
+</Step>
+</Steps>
+
+### GitHub collaborator (Ultimate)
+
+<Steps>
+<Step title="Submit username">
+POST `/api/github-access` with `githubUsername` (auth + Ultimate license required).
+</Step>
+<Step title="Send invite">
+Server calls GitHub API with PAT, stores the username, and returns invite status.
+</Step>
+<Step title="Check status">
+GET `/api/github-access` reports collaborator/pending state.
+</Step>
+</Steps>
+
+### Changelog / blog
+
+- MDX content under `src/content/changelog` and `src/content/blog`.
+- Blog pages generate dynamic OG images and JSON-LD schemas per post.

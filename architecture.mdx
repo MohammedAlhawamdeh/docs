@@ -1,0 +1,37 @@
+---
+title: Architecture
+description: How KwikSaaS is structured across app routes, APIs, Supabase, Stripe, and email.
+---
+
+## Architecture
+
+### Layers
+
+- **UI**: Next.js App Router with React Server Components; marketing, auth, dashboard, blog, changelog, legal.
+- **APIs**: Route handlers under `src/app/api/*` for checkout, billing portal, downloads, GitHub access, webhooks, and OG images.
+- **Server actions**: Auth and dashboard actions for Supabase-backed reads/writes.
+- **Domain libs**: Payments (`lib/payments`), access control (`lib/access`), email (`lib/email`), license management (`lib/license`), SEO (`lib/seo`), rate limiter (`lib/rate-limit`), GitHub collaborator helper (`lib/github`).
+- **Data**: Supabase Postgres tables for subscriptions, one-time purchases, payment history, profiles, license keys, download history; Storage buckets for downloads and avatars.
+- **Integrations**: Stripe (billing), Resend (email), PostHog (analytics), GitHub (collaborator access).
+
+### Request flows
+
+- **Marketing → Checkout**: Landing pricing buttons POST to `/api/checkout_sessions` → Stripe Checkout with plan metadata → redirect to success; cancellation returns to marketing.
+- **Webhook sync**: `/api/webhooks/stripe` verifies signature, upserts `user_subscriptions`/`one_time_purchases`/`payment_history`, mints license keys, and optionally sends purchase emails + PostHog events.
+- **Downloads**: `/api/download` enforces Supabase auth + license validity, checks plan (Standard blocks `version=latest`), generates a signed Storage URL, and records download history.
+- **GitHub access**: `/api/github-access` lets Ultimate users request collaborator invites via GitHub API and stores `github_username`.
+- **Dashboard**: Client-side context fetches profile + subscription via server actions, gated by Supabase session (middleware/proxy).
+
+### Access control
+
+- Middleware (`lib/supabase/middleware`) refreshes sessions, redirects unauthenticated users away from `/dashboard`, and prevents authed users from hitting auth routes.
+- `lib/access.ts` centralizes checks: one-time purchase, lifetime, trialing/active subscription, feature gating by plan, and admin variants bypassing RLS.
+
+### SEO & OG
+
+- Config in `lib/seo/config.ts`; helpers for metadata and JSON-LD; dynamic OG images at `/api/og` and `/api/og/blog`.
+
+### Analytics
+
+- PostHog client/provider (disabled in development or without key).
+- Server helpers to capture/identify events and track subscription outcomes.

@@ -1,97 +1,53 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: KwikSaaS Overview
+description: Production-ready SaaS starter with Next.js 16, Supabase, Stripe, Resend, and PostHog.
 ---
+## KwikSaaS
 
-## Setting up
+Launch a branded SaaS with authentication, billing, email, analytics, and a polished marketing + dashboard experience out of the box.
 
-Get your documentation site up and running in minutes.
+<Tip>
+Keep marketing content, plan data, and Stripe price IDs in sync to avoid checkout surprises.
+</Tip>
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+### What’s inside
 
-## Make it yours
+- **Authentication**: Supabase Auth (email/password, magic links, OAuth Google/GitHub), protected routes via middleware.
+- **Billing**: Stripe Checkout + Customer Portal, subscriptions (monthly/yearly/trial) and one-time/lifetime, webhook-driven sync to Supabase.
+- **Licensing & downloads**: License keys tied to purchases, gated downloads from Supabase Storage, GitHub collaborator access for Ultimate.
+- **Emails**: Resend + React Email templates (magic link, reset, confirm, purchase receipt).
+- **Content**: MDX blog, changelog, and legal pages with dynamic OG images and JSON-LD.
+- **UI**: 50+ shadcn/radix components, marketing sections, dark mode, animated hero/pricing.
+- **Analytics**: PostHog client + server helpers (disabled in dev by default).
+- **SEO**: Central config, sitemap/robots, structured data, OG generation.
 
-Design a docs site that looks great and empowers your users.
+### Quick facts
 
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
+- Framework: Next.js 16 (App Router, React 19)
+- Language: TypeScript, Tailwind CSS v4
+- Backend: Supabase (Postgres, Auth, Storage)
+- Payments: Stripe
+- Email: Resend
+- Analytics: PostHog (optional)
+- Validation: Zod
 
-## Create beautiful pages
+### High-level architecture
 
-Everything you need to create world-class documentation.
+```mermaid
+flowchart TD
+  A[Client UI: marketing / auth / dashboard] --> B[Next.js App Router]
+  B --> C[API routes / server actions]
+  C -->|Service role| D[Supabase DB + Storage]
+  C -->|SDK| E[Stripe Checkout + Portal + Webhooks]
+  C -->|HTTP| F[Resend Emails]
+  C -->|HTTP| G[GitHub API (collaborators)]
+  B --> H[PostHog Client]
+  C --> I[PostHog Server]
+  D -->|RLS| B
+```
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+### How the pieces fit
 
-## Need inspiration?
-
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+- Marketing pages call `/api/checkout_sessions` → Stripe Checkout collects payment → Stripe webhooks write subscriptions/purchases to Supabase → license keys are minted and confirmation emails sent → downloads and GitHub access check license/subscription state.
+- Dashboard uses Supabase client + server actions to read RLS-protected data; access gating is centralized in `lib/access.ts`.
+- SEO/OG and analytics are opt-in and driven by centralized config in `src/lib/seo`.

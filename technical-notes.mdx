@@ -1,0 +1,23 @@
+---
+title: Technical Notes & Improvements
+description: Known caveats and recommended improvements.
+---
+
+## Technical Notes & Improvements
+
+## Caveats
+
+- **Rate limiting**: In-memory only; not suitable for multi-region/serverless scale. Replace with Redis/KV (e.g., Upstash) for production.
+- **Plan definitions**: Duplicated across `lib/payments/plans.ts`, `config/plans.config.ts`, and marketing pricing; keep in sync with Stripe price IDs.
+- **Download file naming**: `/api/download` assumes `kwiksaas-boilerplate-main.zip` in bucket `download`; update constants if file name/version changes.
+- **Stripe API version**: Pinned to `2025-11-17.clover`; monitor for breaking changes.
+- **PostHog**: Disabled in development or when key is missing; set keys before expecting tracking.
+- **GitHub access**: Requires PAT with repo admin; endpoint will fail silently without envs.
+
+## Suggested improvements
+
+- Externalize rate limiting to Redis and share across instances.
+- Centralize plan data to a single source consumed by marketing, pricing, and webhook logic.
+- Parameterize download version/file name in config/env.
+- Add tests for checkout→webhook→Supabase writes, download gating, GitHub access, and auth callback flows.
+- Add observability around webhook failures and email sending.

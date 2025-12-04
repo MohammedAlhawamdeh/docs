@@ -1,0 +1,100 @@
+---
+title: API Endpoints
+description: Server routes for checkout, billing, downloads, GitHub access, and OG images.
+---
+
+## API Endpoints
+
+### Checkout
+
+**POST `/api/checkout_sessions`**
+
+<RequestExample>
+```bash cURL
+curl -X POST https://yourdomain.com/api/checkout_sessions \
+  -H "Content-Type: application/json" \
+  -d '{"priceId":"price_123"}'
+```
+</RequestExample>
+
+<ParamField body="priceId" type="string" required>
+Stripe price ID for the plan. `price_id` is also accepted.
+</ParamField>
+
+<ResponseExample>
+```json Success
+{ "url": "https://checkout.stripe.com/c/session_123" }
+```
+</ResponseExample>
+
+<Info>
+Rate limited (checkout bucket). Returns 400 for invalid plan/price, 429 when rate limit is exceeded.
+</Info>
+
+### Billing portal
+
+**POST `/api/customer_portal`** (JSON body optional `return_url`)  
+**GET `/api/customer_portal`** (query optional `return_url`)
+
+Requires Supabase auth. Creates Stripe billing portal using stored `stripe_customer_id`; GET redirects on failure.
+
+### Downloads
+
+**GET `/api/download`**
+
+Requires Supabase auth. Validates active license, blocks Standard from `version=latest`, returns signed Storage URL and logs download.
+
+<RequestExample>
+```bash cURL
+curl -X GET "https://yourdomain.com/api/download?version=latest" \
+  -H "Cookie: supabase-auth=..."
+```
+</RequestExample>
+
+### GitHub access (Ultimate)
+
+**POST `/api/github-access`**
+
+<ParamField body="githubUsername" type="string" required>
+GitHub username to invite as collaborator. Requires Ultimate license.
+</ParamField>
+
+<ResponseExample>
+```json Success
+{
+  "success": true,
+  "alreadyCollaborator": false,
+  "repoUrl": "https://github.com/OWNER/REPO",
+  "message": "Invitation sent! Check your GitHub email to accept."
+}
+```
+</ResponseExample>
+
+**GET `/api/github-access`**
+
+Returns collaborator/pending status for the current user. Requires Supabase auth.
+
+### Stripe webhooks
+
+**POST `/api/webhooks/stripe`**
+
+Verifies `stripe-signature` with `STRIPE_WEBHOOK_SECRET`. Handles `checkout.session.completed`, `customer.subscription.*`, `invoice.payment_succeeded|failed`, `payment_intent.succeeded`. Upserts subscription/purchase tables, logs payment history, mints license keys, and may send emails + PostHog events.
+
+<Warning>
+Ensure the endpoint URL matches your environment, and keep `STRIPE_WEBHOOK_SECRET` per environment to avoid verification failures.
+</Warning>
+
+### OG images
+
+**GET `/api/og`** — Site OG image (edge)  
+**GET `/api/og/blog`** — Blog OG image with `title`, `author`, `date` query params.
+
+### Auth callback
+
+**GET `/auth/callback`**
+
+Supabase callback handler for OAuth, magic link, email confirmation, and recovery. Promotes hash params to query, sets recovery cookie for reset flow, redirects to dashboard or `next` param.
+
+### Rate limiting
+
+All user-triggered routes apply the in-memory rate limiter (checkout/contact/api/webhook buckets). Use a shared Redis/KV implementation for production scale to avoid per-instance inconsistencies.

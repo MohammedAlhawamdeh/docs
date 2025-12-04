@@ -1,11 +1,12 @@
 {
   "$schema": "https://mintlify.com/docs.json",
+  "projectId": "6931b95029738e18d197eedc",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "KwikSaaS Docs",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#6366F1",
+    "light": "#A5B4FC",
+    "dark": "#4338CA"
   },
   "favicon": "/favicon.svg",
   "navigation": {
@@ -14,55 +15,46 @@
         "tab": "Guides",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Overview",
             "pages": [
               "index",
               "quickstart",
+              "deployment"
+            ]
+          },
+          {
+            "group": "Architecture",
+            "pages": [
+              "architecture",
+              "backend-flows",
+              "folder-structure",
+              "data-models"
+            ]
+          },
+          {
+            "group": "Product Guides",
+            "pages": [
+              "environment",
+              "components",
+              "flows",
+              "technical-notes"
+            ]
+          },
+          {
+            "group": "Dev Workflow",
+            "pages": [
               "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "API",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Endpoints",
             "pages": [
-              "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api-reference/endpoints"
             ]
           }
         ]
@@ -71,14 +63,9 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Docs Home",
+          "href": "https://docs.kwiksaasapp.com",
+          "icon": "globe"
         }
       ]
     }
@@ -91,32 +78,36 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:support@kwiksaasapp.com"
+      },
+      {
+        "label": "GitHub",
+        "href": "https://github.com/MohammedAlhawamdeh/kwiksaas"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "href": "https://www.kwiksaasapp.com/dashboard"
     }
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/mohawamdehtech",
+      "github": "https://github.com/MohammedAlhawamdeh",
+      "linkedin": "https://linkedin.com/in/MohammedAlhawamdeh"
     }
   }
 }

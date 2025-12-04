@@ -1,0 +1,65 @@
+---
+title: Environment Variables
+description: Required and optional env vars for Supabase, Stripe, Resend, PostHog, and GitHub access.
+---
+
+## Environment Variables
+
+## Core
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Yes | Supabase anon key for client/server SSR |
+| `SUPABASE_SECRET_KEY` | Yes (server) | Service role key for webhooks, admin ops, storage |
+| `NEXT_PUBLIC_SITE_URL` | Yes | Base URL for callbacks, emails, OG, success URLs |
+
+## Stripe
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `STRIPE_SECRET_KEY` | Yes | Stripe API key (server) |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Yes | Client key (if needed) |
+| `STRIPE_WEBHOOK_SECRET` | Yes | Webhook signature verification |
+| `NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_MONTHLY` | Yes (if plan used) | Pro monthly |
+| `NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_YEARLY` | Yes (if plan used) | Pro yearly |
+| `NEXT_PUBLIC_STRIPE_PRICE_ID_LIFETIME` | Optional | Lifetime one-time |
+| `NEXT_PUBLIC_STRIPE_PRICE_ID_STANDARD_LIFETIME` | Optional | Standard lifetime |
+| `NEXT_PUBLIC_STRIPE_PRICE_ID_ULTIMATE_LIFETIME` | Optional | Ultimate lifetime |
+| `NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_TRIAL` | Optional | Pro with trial |
+| `NEXT_PUBLIC_STRIPE_PRICE_ID_STARTER`, `NEXT_PUBLIC_STRIPE_PRICE_ID_PRO` | Optional | Marketing pricing showcase |
+
+## Resend
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `RESEND_API_KEY` | Yes | Email sending |
+| `RESEND_FROM_EMAIL` | Yes | From address |
+| `RESEND_LOGO_URL` | Yes | Logo in email templates |
+
+## Analytics
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `NEXT_PUBLIC_POSTHOG_KEY` | No | Enables PostHog tracking |
+| `NEXT_PUBLIC_POSTHOG_HOST` | No | Defaults `https://app.posthog.com` |
+
+## Demo / misc
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `NEXT_PUBLIC_DEMO_URL` | No | Overrides demo subdomain target |
+
+## GitHub collaborator access (Ultimate)
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `GITHUB_TOKEN` | No (only if offering repo access) | PAT with repo admin rights |
+| `GITHUB_REPO_OWNER` | No | Repo owner |
+| `GITHUB_REPO_NAME` | No | Repo name |
+
+## Safe defaults
+
+- `NEXT_PUBLIC_SITE_URL=http://localhost:3000` for local dev.
+- Keep all Stripe keys in test mode locally.
+- Leave PostHog vars empty to disable tracking in development.

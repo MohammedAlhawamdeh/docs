@@ -1,0 +1,44 @@
+---
+title: Backend Flows
+description: Auth, billing, licensing, downloads, and GitHub access lifecycles.
+---
+
+## Backend Flows
+
+### Auth lifecycle
+
+- Supabase Auth handles email/password, OAuth (Google/GitHub), and magic links.
+- Route: `/auth/callback` exchanges codes/token hashes, enforces recovery cookie for reset flow, redirects to dashboard or `next` param.
+- Middleware: redirects unauthenticated users from `/dashboard*`; redirects authenticated users away from `/sign-in|/sign-up|/forgot-password|/reset-password` unless in recovery mode.
+- Server actions `(auth)/actions.ts`: sign-in/up, magic link, OAuth redirect, reset email, reset password, sign-out; all rate-limited and sanitized errors.
+
+### Billing lifecycle
+
+1. **Checkout**: `/api/checkout_sessions` receives `priceId` (or `price_id`), rate-limits by IP, maps to plan config, creates Stripe Checkout session with metadata `{user_id?, plan_id, plan_type, price_id}`.
+2. **Webhook**: `/api/webhooks/stripe` verifies signature with `STRIPE_WEBHOOK_SECRET`, then:
+   - `checkout.session.completed` → one-time purchase handler or subscription upsert.
+   - `customer.subscription.created|updated|deleted` → upsert `user_subscriptions`.
+   - `invoice.payment_succeeded|failed` → insert `payment_history`.
+   - `payment_intent.succeeded` for one-time → inserts `one_time_purchases` + `payment_history`.
+3. **License & email**: One-time purchase flow creates a license key and sends purchase confirmation via Resend (if email available/valid).
+4. **Portal**: `/api/customer_portal` (GET/POST) creates Stripe portal session using stored `stripe_customer_id`.
+
+### Licensing & downloads
+
+- License table ties a purchase to `plan_id`, email, GitHub username (optional), download counts.
+- `/api/download`: requires Supabase auth, checks active license and expiry, blocks Standard from `version=latest`, generates signed Storage URL, records download history and increments count via RPC.
+
+### GitHub collaborator access
+
+- `/api/github-access` (POST): requires auth + Ultimate license; validates username, calls GitHub API with PAT + repo envs, stores `github_username`, returns invitation status.
+- `/api/github-access` (GET): reports current collaborator or pending invitation state.
+
+### Analytics
+
+- Server events tracked via `lib/posthog/server.ts` (disabled in dev/missing key).
+- Checkout/webhook paths send subscription/purchase events with plan, billing cycle, amount, currency.
+
+### SEO & OG
+
+- JSON-LD generators for site, organization, pages, articles.
+- Dynamic OG images at `/api/og` (site) and `/api/og/blog` (post title/author/date).

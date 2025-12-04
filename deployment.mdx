@@ -1,0 +1,35 @@
+---
+title: Deployment
+description: Steps for deploying KwikSaaS to production.
+---
+
+## Deployment
+
+<Steps>
+<Step title="Prepare env on the host">
+Set all required variables (Supabase, Stripe, Resend, PostHog, GitHub if used) and set `NEXT_PUBLIC_SITE_URL=https://yourdomain.com`.
+</Step>
+
+<Step title="Provision Supabase">
+Create the project, run migrations, and ensure Storage buckets `download` and `avatars` exist. Add auth redirect URL: `https://yourdomain.com/auth/callback`.
+</Step>
+
+<Step title="Configure Stripe production">
+- Create production prices and map IDs in env.
+- Add webhook endpoint `https://yourdomain.com/api/webhooks/stripe` with events `checkout.session.completed`, `customer.subscription.*`, `invoice.*`, `payment_intent.succeeded`.
+</Step>
+
+<Step title="Deploy to Vercel (recommended)">
+Connect the repo, add env vars, and deploy. Any other Next.js host works (Railway, Render, DO App Platform, AWS Amplify) with Node 18+.
+</Step>
+
+<Step title="Verify post-deploy">
+- Auth flows redirect correctly.
+- Checkout completes and webhook inserts rows.
+- `/api/download` returns a signed URL for licensed users.
+</Step>
+</Steps>
+
+<Warning>
+If Stripe price IDs differ between staging and prod, set the correct values per environment to avoid checkout failures.
+</Warning>

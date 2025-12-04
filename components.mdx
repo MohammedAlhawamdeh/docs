@@ -1,0 +1,49 @@
+---
+title: Components
+description: Key UI and server components and how they fit into the flows.
+---
+
+## Components
+
+## Marketing
+
+- **HeroSection** (`src/app/(marketing)/sections/hero.tsx`): animated headline with Wistia embed and dual CTAs.
+- **PricingShowcaseSection**: client-side pricing cards; posts `priceId` to `/api/checkout_sessions`. Requires Stripe price envs.
+- **TechStackSection**, **SocialProofSection**, **FAQSection**, **CTASection**, **AnnouncementBarSection**: prop-driven content from `src/config/marketing.config.ts`.
+
+## Shared
+
+- **Header/Footer** (`components/shared`): navigation + CTA; uses `site.config.ts`.
+- **ThemeToggle** variants and **Container** layout primitives.
+- **Breadcrumbs** for blog/post pages.
+
+## Auth
+
+- **AuthPageLayout**: consistent auth shell (title/subtitle/footer link).
+- **OAuthButtons**: Google/GitHub buttons wired to Supabase OAuth.
+- **UpdatePasswordForm**: password reset UI.
+- **AuthProvider**: wraps app (in `layout.tsx`), exposes `{ user, session, loading, signOut }`, identifies PostHog user when available.
+
+## Dashboard
+
+- **DashboardProvider**: fetches profile + subscription via server actions, listens to Supabase auth events, exposes refresh/signOut helpers.
+- **AppSidebar**, **HeaderUserMenu**, **NotificationsDropdown**, **SectionCards**, **ChartAreaInteractive**, **DataTable**: sample analytics UI.
+
+## Emails
+
+- **MagicLinkEmail**, **ConfirmEmailTemplate**, **ResetPasswordEmail**, **PurchaseConfirmationTemplate** under `components/emails/*`. Used by `lib/email/auth.ts` and `lib/email/purchase.ts`.
+
+## UI primitives
+
+- shadcn/radix components in `components/ui/*` plus animated backgrounds and text effects.
+- Use `cn` from `lib/utils.ts` for Tailwind class merging.
+
+## Server helpers
+
+- **Access control** (`lib/access.ts`): check/require access, feature gating, admin variants.
+- **Payments** (`lib/payments/plans.ts`): plan definitions, feature keys, formatting, price-to-plan mapping.
+- **Supabase clients** (`lib/supabase/*`): browser/server/admin factories, middleware session updater.
+- **Emails** (`lib/email/*`): Resend senders with env validation.
+- **GitHub** (`lib/github.ts`): collaborator add/check/remove + repo URL helper.
+- **License** (`lib/license.ts`): generate/validate license keys, download recording.
+- **Rate limiting** (`lib/rate-limit.ts`): in-memory sliding window presets for auth, checkout, webhook, etc.

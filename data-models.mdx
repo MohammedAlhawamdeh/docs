@@ -1,0 +1,35 @@
+---
+title: Data Models
+description: Supabase tables and buckets powering billing, profiles, and licensing.
+---
+
+## Data Models
+
+## Tables
+
+| Table | Purpose | Key fields / notes |
+| --- | --- | --- |
+| `stripe_products` | Optional product cache | `active` RLS read for authenticated |
+| `stripe_prices` | Cached Stripe prices | `plan_type` (`one_time`/`recurring`), `billing_cycle`, `trial_days`, `is_lifetime`; RLS read active |
+| `user_subscriptions` | One subscription row per user | `stripe_subscription_id`, `stripe_customer_id`, `stripe_price_id`, `status`, `billing_cycle`, `trial_*`, `cancel_at(_period_end)`, `lifetime`; RLS owner read |
+| `one_time_purchases` | Lifetime/one-off entitlements | `stripe_payment_intent_id`, `status`, `granted_at`, `revoked_at`; RLS owner read |
+| `payment_history` | Ledger of invoices/charges | `payment_type` (`recurring`/`one_time`), `invoice_url`; RLS owner read |
+| `user_profiles` | Profile + notification prefs | `full_name`, `username`, `profile_image_url`, locale/timezone, notification booleans; CRUD for owner |
+| `license_keys` | License per purchase | `license_key`, `plan_id` (`standard`/`ultimate`), `email`, `github_username`, `download_count`, `expires_at`; RLS owner read |
+| `download_history` | Download audit | `license_id`, `user_id`, `ip_address`, `user_agent`, `version`; RLS owner read |
+
+## Triggers & helper
+
+- `handle_updated_at` trigger keeps `updated_at` current on products, prices, subscriptions, profiles.
+- RPC `increment_download_count` updates license counts.
+
+## Buckets
+
+- `download` — Product ZIP served via signed URLs in `/api/download`.
+- `avatars` — User-uploaded profile images (public URLs generated in profile actions).
+
+## Access patterns
+
+- RLS enforced for end users; webhook/admin paths use `SUPABASE_SECRET_KEY`.
+- `lib/access.ts` first checks `one_time_purchases`, then `user_subscriptions` with `status in ('active','trialing','past_due')`, plus lifetime flag and period end.
+- Feature gating uses plan config `featureAccess` (e.g., `basic`, `templates`, `api`, `custom_domain`, `advanced`).
