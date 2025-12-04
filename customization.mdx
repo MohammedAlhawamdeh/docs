@@ -1,0 +1,435 @@
+---
+title: Customization
+description: Brand KwikSaaS with your logo, colors, and content.
+---
+
+## Customization
+
+Make KwikSaaS your own by updating branding, colors, marketing content, and theme settings.
+
+---
+
+## Logo & Branding
+
+### Main Logo
+
+The logo component is at `src/components/shared/logo.tsx`.
+
+**Method 1: Inline SVG (Recommended)**
+
+This allows your logo to change color with themes (dark mode support).
+
+```tsx
+// src/components/shared/logo.tsx
+{
+  showIcon && (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      className={cn("h-6 w-6", iconClassName)}
+    >
+      <path d="your-svg-path-data" fill="currentColor" />
+    </svg>
+  );
+}
+```
+
+<Tip>
+  Using `fill="currentColor"` makes the logo automatically adapt to light/dark
+  themes.
+</Tip>
+
+**Method 2: Image File**
+
+For complex logos or when you need exact color matching:
+
+```tsx
+import Image from "next/image";
+
+<Image src="/logo.svg" alt="Your Logo" width={100} height={24} />;
+```
+
+Place your logo file in the `public/` directory.
+
+### Favicon
+
+Update the dynamic favicon in `src/app/icon.tsx`:
+
+```tsx
+export default function Icon() {
+  return new ImageResponse(
+    <div
+      style={
+        {
+          /* your icon styles */
+        }
+      }
+    >
+      {/* Your icon content */}
+    </div>,
+    { width: 32, height: 32 }
+  );
+}
+```
+
+Or replace with a static file at `public/favicon.ico`.
+
+---
+
+## Colors & Theme
+
+### Tailwind Colors
+
+Primary colors are defined as CSS variables in `src/app/globals.css`:
+
+```css
+:root {
+  --primary: 239 84% 67%; /* HSL values */
+  --primary-foreground: 0 0% 100%;
+  /* ... other colors */
+}
+
+.dark {
+  --primary: 239 84% 67%;
+  --primary-foreground: 0 0% 100%;
+  /* ... dark mode colors */
+}
+```
+
+### Theme Toggle
+
+Dark mode is handled by `next-themes`. The toggle component is in `src/components/shared/theme-toggle.tsx`.
+
+Theme features:
+
+- **System preference detection** — Respects OS color scheme
+- **Manual toggle** — Sun/moon icons in header and dashboard
+- **Hydration-safe** — No flash of unstyled content
+
+---
+
+## Site Configuration
+
+Central site config is in `src/lib/seo/config.ts`:
+
+```typescript
+export const siteConfig = {
+  name: "KwikSaaS",
+  tagline: "Launch Your SaaS Faster",
+  description: "Your site description...",
+  url: "https://www.kwiksaasapp.com",
+
+  company: {
+    name: "KwikSaaS Technologies Inc.",
+    email: "support@kwiksaasapp.com",
+  },
+
+  links: {
+    twitter: "https://x.com/yourusername",
+    linkedin: "https://linkedin.com/in/yourusername",
+    github: "https://github.com/yourusername",
+  },
+
+  twitterHandle: "yourusername",
+};
+```
+
+This config powers:
+
+- SEO metadata
+- Footer links
+- Social sharing
+- JSON-LD structured data
+
+---
+
+## Marketing Sections
+
+### Hero Section
+
+Edit `src/app/(marketing)/sections/hero.tsx`:
+
+```tsx
+// Update headline
+<h1>Your Headline Here</h1>
+
+// Update subheading
+<p>Your value proposition...</p>
+
+// Update CTA buttons
+<Button>Get Started</Button>
+<Button variant="outline">View Demo</Button>
+```
+
+### Features Section
+
+Features are defined in `src/config/marketing.config.ts`:
+
+```typescript
+export const features = [
+  {
+    title: "Feature Name",
+    description: "Feature description...",
+    icon: IconComponent,
+  },
+  // ... more features
+];
+```
+
+### Pricing Section
+
+Pricing is driven by `src/lib/payments/plans.ts`:
+
+```typescript
+export const plans: Plan[] = [
+  {
+    id: "standard",
+    name: "Standard",
+    description: "Lifetime access to core features",
+    monthlyPrice: 39,
+    features: [
+      "Lifetime access",
+      "Core SaaS boilerplate",
+      "Email & Auth setup",
+    ],
+    stripePriceIds: {
+      monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_STANDARD_LIFETIME,
+    },
+  },
+  // ... more plans
+];
+```
+
+<Warning>
+  Keep plan definitions in sync with Stripe price IDs. Mismatches cause checkout
+  failures.
+</Warning>
+
+### FAQ Section
+
+Edit FAQs in `src/config/marketing.config.ts`:
+
+```typescript
+export const faqs = [
+  {
+    question: "Your question?",
+    answer: "Your answer...",
+  },
+  // ... more FAQs
+];
+```
+
+### Social Proof / Testimonials
+
+Testimonials are in the marketing sections. Update `src/app/(marketing)/sections/social-proof.tsx`:
+
+```tsx
+const testimonials = [
+  {
+    quote: "Customer quote...",
+    author: "Name",
+    role: "Title",
+    company: "Company",
+    avatar: "/path/to/avatar.jpg",
+  },
+];
+```
+
+---
+
+## Header & Footer
+
+### Header Navigation
+
+Edit `src/components/shared/header.tsx`:
+
+```tsx
+const navItems = [
+  { label: "Features", href: "/#features" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Blog", href: "/blog" },
+  // Add your links
+];
+```
+
+### Footer
+
+Edit `src/components/shared/footer.tsx`:
+
+```tsx
+const footerLinks = {
+  product: [
+    { label: "Features", href: "/#features" },
+    { label: "Pricing", href: "/pricing" },
+  ],
+  company: [
+    { label: "About", href: "/about" },
+    { label: "Blog", href: "/blog" },
+  ],
+  legal: [
+    { label: "Privacy", href: "/privacy" },
+    { label: "Terms", href: "/terms-of-service" },
+  ],
+};
+```
+
+---
+
+## Dashboard Sidebar
+
+Edit navigation in `src/components/dashboard/app-sidebar.tsx`:
+
+```typescript
+const navMain = [
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: LayoutDashboard,
+    items: [
+      { title: "Overview", url: "/dashboard" },
+      { title: "Analytics", url: "/dashboard/analytics" },
+    ],
+  },
+  {
+    title: "Settings",
+    url: "/dashboard/settings",
+    icon: Settings,
+    isActive: pathname.startsWith("/dashboard/settings"),
+    items: [
+      { title: "General", url: "/dashboard/settings/general" },
+      { title: "Billing", url: "/dashboard/settings/billing" },
+    ],
+  },
+];
+```
+
+### Active State
+
+Use `usePathname()` to highlight active nav items:
+
+```typescript
+const pathname = usePathname();
+const isActive = pathname.startsWith("/dashboard/settings");
+```
+
+---
+
+## Content (MDX)
+
+### Blog Posts
+
+Create posts in `src/content/blog/`:
+
+```mdx
+---
+title: "Your Post Title"
+description: "Post description..."
+date: "2024-01-25"
+author:
+  name: "Author Name"
+  picture: "/blog/authors/author.jpg"
+tags: ["Tutorial", "Guide"]
+thumbnail: "https://images.unsplash.com/..."
+---
+
+Your content here...
+```
+
+### Changelog
+
+Create entries in `src/content/changelog/`:
+
+```mdx
+---
+title: "v1.2.0"
+date: "2024-01-25"
+---
+
+## New Features
+
+- Feature 1
+- Feature 2
+
+## Bug Fixes
+
+- Fix 1
+```
+
+### Legal Pages
+
+Edit legal content in `src/content/legal/`:
+
+- `privacy.mdx`
+- `terms-of-service.mdx`
+- `cookie-policy.mdx`
+
+---
+
+## SEO & Open Graph
+
+### Page Metadata
+
+Use the metadata helper for new pages:
+
+```tsx
+// In your page.tsx
+import { createMetadata } from "@/lib/seo";
+
+export const metadata = createMetadata({
+  title: "Page Title",
+  description: "Page description...",
+  path: "/your-path",
+});
+```
+
+### Dynamic OG Images
+
+OG images are generated at:
+
+- `/api/og` — Site-wide OG image
+- `/api/og/blog` — Blog post OG images
+
+Customize in `src/app/api/og/route.tsx`.
+
+---
+
+## Quick Customization Checklist
+
+<Steps>
+<Step title="Update site config">
+Edit `src/lib/seo/config.ts` with your brand name, URL, and social links.
+</Step>
+
+<Step title="Replace logo">
+  Update `src/components/shared/logo.tsx` with your logo SVG or image.
+</Step>
+
+<Step title="Set colors">
+  Modify CSS variables in `src/app/globals.css` for your brand colors.
+</Step>
+
+<Step title="Update marketing content">
+  Edit hero, features, pricing, and FAQ in marketing sections and configs.
+</Step>
+
+<Step title="Configure Stripe">
+  Match plan definitions in `plans.ts` with your Stripe products.
+</Step>
+
+<Step title="Update legal pages">
+Edit privacy, terms, and cookie policy in `src/content/legal/`.
+</Step>
+</Steps>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Payments" icon="credit-card" href="/payments">
+    Configure Stripe products and checkout
+  </Card>
+  <Card title="Deployment" icon="rocket" href="/deployment">
+    Deploy to Vercel or your preferred host
+  </Card>
+</CardGroup>

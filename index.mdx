@@ -1,44 +1,113 @@
 ---
-title: KwikSaaS Overview
+title: KwikSaaS
 description: Production-ready SaaS starter with Next.js 16, Supabase, Stripe, Resend, and PostHog.
 ---
-## KwikSaaS
 
-Launch a branded SaaS with authentication, billing, email, analytics, and a polished marketing + dashboard experience out of the box.
+## Welcome to KwikSaaS
 
-<Tip>
-Keep marketing content, plan data, and Stripe price IDs in sync to avoid checkout surprises.
-</Tip>
+Launch your SaaS product in days, not months. KwikSaaS is a complete, production-ready boilerplate with authentication, billing, email, analytics, and a polished UI out of the box.
 
-### What’s inside
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Get running locally in under 10 minutes
+  </Card>
+  <Card title="Authentication" icon="lock" href="/authentication">
+    Supabase Auth with OAuth, magic links, and more
+  </Card>
+  <Card title="Payments" icon="credit-card" href="/payments">
+    Stripe checkout, subscriptions, and customer portal
+  </Card>
+  <Card title="Customization" icon="palette" href="/customization">
+    Brand with your logo, colors, and content
+  </Card>
+</CardGroup>
 
-- **Authentication**: Supabase Auth (email/password, magic links, OAuth Google/GitHub), protected routes via middleware.
-- **Billing**: Stripe Checkout + Customer Portal, subscriptions (monthly/yearly/trial) and one-time/lifetime, webhook-driven sync to Supabase.
-- **Licensing & downloads**: License keys tied to purchases, gated downloads from Supabase Storage, GitHub collaborator access for Ultimate.
-- **Emails**: Resend + React Email templates (magic link, reset, confirm, purchase receipt).
-- **Content**: MDX blog, changelog, and legal pages with dynamic OG images and JSON-LD.
-- **UI**: 50+ shadcn/radix components, marketing sections, dark mode, animated hero/pricing.
-- **Analytics**: PostHog client + server helpers (disabled in dev by default).
-- **SEO**: Central config, sitemap/robots, structured data, OG generation.
+---
 
-### Quick facts
+## What's Included
 
-- Framework: Next.js 16 (App Router, React 19)
-- Language: TypeScript, Tailwind CSS v4
-- Backend: Supabase (Postgres, Auth, Storage)
-- Payments: Stripe
-- Email: Resend
-- Analytics: PostHog (optional)
-- Validation: Zod
+<AccordionGroup>
+<Accordion title="Authentication" icon="lock">
+Complete auth system with Supabase:
+- Email/password with verification
+- OAuth providers (Google, GitHub)
+- Magic links for passwordless login
+- Password reset flow
+- Protected routes via middleware
+- Session management (server + client)
+</Accordion>
 
-### High-level architecture
+<Accordion title="Payments" icon="credit-card">
+  Stripe integration for billing: - Checkout sessions for subscriptions and
+  one-time purchases - Customer Portal for self-service management - Webhook
+  handlers for automatic database sync - Plan-based feature gating - Promo codes
+  and coupons support
+</Accordion>
+
+<Accordion title="Email" icon="envelope">
+  Transactional emails with Resend: - Magic link emails - Email confirmation -
+  Password reset - Purchase receipts - React Email templates for customization
+</Accordion>
+
+<Accordion title="Dashboard" icon="gauge">
+  Production-ready dashboard: - Collapsible sidebar navigation - Settings pages
+  (general, account, billing, notifications) - Interactive charts (Recharts) -
+  Data tables with sorting and filtering - User menu with profile and sign-out
+</Accordion>
+
+<Accordion title="Marketing" icon="bullhorn">
+  Conversion-optimized landing pages: - Hero section with CTAs - Features
+  showcase (grid, bento, accordion) - Social proof marquee - Pricing page with
+  plan comparison - FAQ accordion - Contact form with validation
+</Accordion>
+
+<Accordion title="Content" icon="file-lines">
+  MDX-powered content: - Blog with tags, authors, and thumbnails - Changelog for
+  version updates - Legal pages (privacy, terms, cookies) - Syntax highlighting
+  with Shiki - Dynamic OG image generation
+</Accordion>
+
+<Accordion title="Analytics" icon="chart-line">
+  PostHog integration (optional): - Automatic pageview tracking - Custom event
+  capture (client + server) - User identification - Feature flags and A/B
+  testing - Session replay support
+</Accordion>
+
+<Accordion title="SEO" icon="magnifying-glass">
+Built-in SEO best practices:
+- Dynamic sitemap generation
+- robots.txt configuration
+- Metadata API for all pages
+- Open Graph images
+- JSON-LD structured data
+</Accordion>
+</AccordionGroup>
+
+---
+
+## Tech Stack
+
+| Layer      | Technology                         |
+| ---------- | ---------------------------------- |
+| Framework  | Next.js 16 (App Router, React 19)  |
+| Language   | TypeScript, Tailwind CSS v4        |
+| Database   | Supabase (Postgres, Auth, Storage) |
+| Payments   | Stripe                             |
+| Email      | Resend + React Email               |
+| Analytics  | PostHog (optional)                 |
+| Validation | Zod + React Hook Form              |
+| UI         | 50+ shadcn/radix components        |
+
+---
+
+## Architecture Overview
 
 ```mermaid
 flowchart TD
-    A[Client UI (marketing · auth · dashboard)] --> B[Next.js App Router]
-    B --> C[API routes and server actions]
-    C -->|Service role| D[Supabase DB and Storage]
-    C -->|Stripe SDK| E[Stripe Checkout and Portal]
+    A[Client UI] --> B[Next.js App Router]
+    B --> C[API Routes & Server Actions]
+    C -->|Service role| D[Supabase DB & Storage]
+    C -->|Stripe SDK| E[Stripe Checkout & Portal]
     C -->|HTTP| F[Resend Emails]
     C -->|HTTP| G[GitHub API]
     B --> H[PostHog Client]
@@ -46,8 +115,61 @@ flowchart TD
     D -->|RLS| B
 ```
 
-### How the pieces fit
+### How It Works
 
-- Marketing pages call `/api/checkout_sessions` → Stripe Checkout collects payment → Stripe webhooks write subscriptions/purchases to Supabase → license keys are minted and confirmation emails sent → downloads and GitHub access check license/subscription state.
-- Dashboard uses Supabase client + server actions to read RLS-protected data; access gating is centralized in `lib/access.ts`.
-- SEO/OG and analytics are opt-in and driven by centralized config in `src/lib/seo`.
+1. **Marketing → Checkout**: Pricing buttons call `/api/checkout_sessions` → Stripe collects payment → webhooks sync to Supabase
+2. **Access Control**: `lib/access.ts` checks subscriptions and one-time purchases
+3. **Dashboard**: Server actions read RLS-protected data; middleware protects routes
+4. **Email**: Auth emails via Resend with React Email templates
+5. **SEO**: Centralized config powers metadata, sitemaps, and OG images
+
+---
+
+## Quick Facts
+
+- **Framework**: Next.js 16 with Turbopack
+- **React**: Version 19 with Server Components
+- **Styling**: Tailwind CSS v4
+- **Package Manager**: npm or pnpm
+- **Minimum Node**: 18+
+
+---
+
+## Getting Help
+
+<CardGroup cols={2}>
+  <Card
+    title="GitHub Issues"
+    icon="github"
+    href="https://github.com/MohammedAlhawamdeh/kwiksaas/issues"
+  >
+    Report bugs or request features
+  </Card>
+  <Card
+    title="Email Support"
+    icon="envelope"
+    href="mailto:support@kwiksaasapp.com"
+  >
+    Direct support for customers
+  </Card>
+</CardGroup>
+
+---
+
+## Next Steps
+
+<Steps>
+  <Step title="Clone and install">
+    Follow the [Quickstart](/quickstart) to get running locally.
+  </Step>
+  <Step title="Configure services">
+    Set up Supabase, Stripe, and Resend with your API keys.
+  </Step>
+  <Step title="Customize branding">
+    Update logo, colors, and content in the [Customization](/customization)
+    guide.
+  </Step>
+  <Step title="Deploy">
+    Push to production with [Deployment](/deployment) instructions.
+  </Step>
+</Steps>

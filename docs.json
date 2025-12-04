@@ -15,35 +15,36 @@
         "tab": "Guides",
         "groups": [
           {
-            "group": "Overview",
+            "group": "Getting Started",
             "pages": [
               "index",
               "quickstart",
-              "deployment"
+              "authentication",
+              "payments",
+              "customization"
             ]
+          },
+          {
+            "group": "Deployment",
+            "pages": ["deployment", "environment"]
           },
           {
             "group": "Architecture",
             "pages": [
               "architecture",
-              "backend-flows",
               "folder-structure",
+              "backend-flows",
               "data-models"
             ]
           },
           {
-            "group": "Product Guides",
+            "group": "Reference",
             "pages": [
-              "environment",
               "components",
               "flows",
-              "technical-notes"
-            ]
-          },
-          {
-            "group": "Dev Workflow",
-            "pages": [
-              "development"
+              "development",
+              "technical-notes",
+              "troubleshooting"
             ]
           }
         ]
@@ -53,8 +54,19 @@
         "groups": [
           {
             "group": "Endpoints",
+            "pages": ["api-reference/endpoints"]
+          }
+        ]
+      },
+      {
+        "tab": "AI Tools",
+        "groups": [
+          {
+            "group": "Setup",
             "pages": [
-              "api-reference/endpoints"
+              "ai-tools/cursor",
+              "ai-tools/windsurf",
+              "ai-tools/claude-code"
             ]
           }
         ]

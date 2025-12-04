@@ -1,85 +1,321 @@
 ---
 title: Quickstart
-description: Install, configure, and run KwikSaaS locally with Supabase, Stripe, and Resend.
+description: Get KwikSaaS running locally in under 10 minutes.
 ---
 
 ## Quickstart
 
-### Prerequisites
+This guide gets you from zero to a running KwikSaaS instance with authentication and payments.
 
-- Node.js 18+
-- Supabase project (URL + anon + service role keys)
-- Stripe account (test mode is fine)
-- Resend account + verified domain
-- (Optional) PostHog project
+<Info>
+  **Time estimate:** 10-15 minutes for basic setup, 30 minutes with Stripe and
+  Resend fully configured.
+</Info>
+
+---
+
+## Prerequisites
+
+<CardGroup cols={2}>
+  <Card title="Node.js 18+" icon="node-js">
+    Check with `node -v`. [Download Node.js](https://nodejs.org/)
+  </Card>
+  <Card title="pnpm or npm" icon="box">
+    Package manager for dependencies
+  </Card>
+  <Card title="Supabase Account" icon="database">
+    Free tier works. [Create account](https://supabase.com)
+  </Card>
+  <Card title="Stripe Account" icon="stripe">
+    Test mode for development. [Sign up](https://stripe.com)
+  </Card>
+</CardGroup>
+
+<Tip>
+  **Minimum viable setup:** You only need Supabase to run the app. Stripe and
+  Resend are optional for initial development.
+</Tip>
+
+---
+
+## Installation
 
 <Steps>
-<Step title="Install dependencies">
-Clone the repo and install packages.
-
+<Step title="Clone the repository">
 ```bash
 git clone https://github.com/MohammedAlhawamdeh/kwiksaas.git
 cd kwiksaas
+```
+</Step>
+
+<Step title="Install dependencies">
+```bash
 npm install
+# or
+pnpm install
 ```
 
 <Check>
-Verify with `npm run lint` to ensure dependencies are healthy.
+Run `npm run lint` to verify everything installed correctly.
 </Check>
 </Step>
 
-<Step title="Configure environment">
-Copy the example env file and fill values.
-
+<Step title="Create environment file">
 ```bash
 cp .env.example .env.local
 ```
+</Step>
+</Steps>
 
-- Supabase: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`
-- Stripe: `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`, price IDs (`PRO_MONTHLY`, `PRO_YEARLY`, `LIFETIME`, `STANDARD_LIFETIME`, `ULTIMATE_LIFETIME`, `PRO_TRIAL`)
-- Resend: `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `RESEND_LOGO_URL`
-- Site: `NEXT_PUBLIC_SITE_URL` (e.g., `http://localhost:3000`)
-- Optional: `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`
+---
+
+## Configure Supabase
+
+<Steps>
+<Step title="Create a Supabase project">
+1. Go to [supabase.com/dashboard](https://supabase.com/dashboard)
+2. Click **New Project**
+3. Choose organization, name, password, and region
+4. Wait for project to initialize (~2 minutes)
+</Step>
+
+<Step title="Get your API keys">
+Go to **Settings → API** and copy:
+
+| Key                 | Environment Variable                   |
+| ------------------- | -------------------------------------- |
+| Project URL         | `NEXT_PUBLIC_SUPABASE_URL`             |
+| `anon` `public` key | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` |
+| `service_role` key  | `SUPABASE_SECRET_KEY`                  |
 
 <Warning>
-Do not commit `.env.local` or any secrets to version control.
+Never expose `SUPABASE_SECRET_KEY` in client-side code. It bypasses Row Level Security.
 </Warning>
 </Step>
 
-<Step title="Apply database schema">
-Push migrations to Supabase.
+<Step title="Configure Auth URLs">
+Go to **Authentication → URL Configuration**:
 
+| Setting       | Value                                 |
+| ------------- | ------------------------------------- |
+| Site URL      | `http://localhost:3000`               |
+| Redirect URLs | `http://localhost:3000/auth/callback` |
+
+</Step>
+
+<Step title="Run database migrations">
+Option A: Using Supabase CLI
 ```bash
+npx supabase link --project-ref YOUR_PROJECT_REF
 npx supabase db push
 ```
 
-Alternatively, run the SQL in `supabase/migrations/*.sql` via the Supabase SQL Editor.
-</Step>
+Option B: Manual SQL
 
-<Step title="Configure Stripe">
-- Create products/prices and map price IDs into `.env.local`.
-- Start a local webhook listener:
-
-```bash
-stripe listen --forward-to localhost:3000/api/webhooks/stripe
-```
-
-Set `STRIPE_WEBHOOK_SECRET` from the listener output.
-</Step>
-
-<Step title="Configure Resend">
-Verify your sending domain and set `RESEND_FROM_EMAIL` and `RESEND_LOGO_URL`.
-</Step>
-
-<Step title="Run the app">
-
-```bash
-npm run dev
-# open http://localhost:3000
-```
+1. Go to **SQL Editor** in Supabase Dashboard
+2. Copy contents of `supabase/migrations/*.sql`
+3. Run the SQL
 
 <Check>
-You should see the marketing homepage; auth flows should redirect correctly.
+Verify tables exist: `user_subscriptions`, `one_time_purchases`, `payment_history`, `user_profiles`
 </Check>
 </Step>
 </Steps>
+
+---
+
+## Configure Stripe (Optional)
+
+<Info>
+  Skip this section if you want to run the app without payments first.
+</Info>
+
+<Steps>
+<Step title="Get API keys">
+Go to [Stripe Dashboard](https://dashboard.stripe.com/apikeys) and copy:
+
+| Key             | Environment Variable                 |
+| --------------- | ------------------------------------ |
+| Publishable key | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` |
+| Secret key      | `STRIPE_SECRET_KEY`                  |
+
+<Tip>
+Use **test mode** keys during development. Toggle "Test mode" in Stripe Dashboard.
+</Tip>
+</Step>
+
+<Step title="Create products and prices">
+1. Go to **Products** in Stripe Dashboard
+2. Create products for Standard and Ultimate plans
+3. Set prices (one-time for lifetime access)
+4. Copy Price IDs (start with `price_`)
+
+Add to `.env.local`:
+
+```bash
+NEXT_PUBLIC_STRIPE_PRICE_ID_STANDARD_LIFETIME=price_...
+NEXT_PUBLIC_STRIPE_PRICE_ID_ULTIMATE_LIFETIME=price_...
+```
+
+</Step>
+
+<Step title="Set up local webhook forwarding">
+Install Stripe CLI and forward webhooks:
+
+```bash
+# Install Stripe CLI (macOS)
+brew install stripe/stripe-cli/stripe
+
+# Login
+stripe login
+
+# Forward webhooks
+stripe listen --forward-to localhost:3000/api/webhooks/stripe
+```
+
+Copy the webhook signing secret and add to `.env.local`:
+
+```bash
+STRIPE_WEBHOOK_SECRET=whsec_...
+```
+
+</Step>
+</Steps>
+
+---
+
+## Configure Resend (Optional)
+
+<Steps>
+<Step title="Get API key">
+1. Sign up at [resend.com](https://resend.com)
+2. Go to **API Keys** and create one
+3. Add to `.env.local`:
+```bash
+RESEND_API_KEY=re_...
+RESEND_FROM_EMAIL=noreply@yourdomain.com
+RESEND_LOGO_URL=https://yourdomain.com/logo.png
+```
+</Step>
+
+<Step title="Verify domain (production)">
+Add DNS records as shown in Resend Dashboard for SPF, DKIM, and DMARC.
+</Step>
+</Steps>
+
+---
+
+## Your .env.local File
+
+Here's a complete example with all variables:
+
+```bash
+# Site
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://yourproject.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=eyJ...
+SUPABASE_SECRET_KEY=eyJ...
+
+# Stripe
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+NEXT_PUBLIC_STRIPE_PRICE_ID_STANDARD_LIFETIME=price_...
+NEXT_PUBLIC_STRIPE_PRICE_ID_ULTIMATE_LIFETIME=price_...
+
+# Resend (optional)
+RESEND_API_KEY=re_...
+RESEND_FROM_EMAIL=auth@yourdomain.com
+RESEND_LOGO_URL=https://yourdomain.com/logo.png
+
+# PostHog (optional)
+# NEXT_PUBLIC_POSTHOG_KEY=phc_...
+# NEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com
+```
+
+---
+
+## Run the App
+
+<Steps>
+<Step title="Start development server">
+```bash
+npm run dev
+```
+</Step>
+
+<Step title="Open in browser">
+Navigate to [http://localhost:3000](http://localhost:3000)
+
+<Check>
+You should see the marketing homepage with hero, pricing, and footer.
+</Check>
+</Step>
+
+<Step title="Test authentication">
+1. Go to `/sign-up`
+2. Create an account with email/password
+3. Check email for verification (or check Supabase Auth logs)
+4. Sign in and land on `/dashboard`
+</Step>
+</Steps>
+
+---
+
+## Verify Everything Works
+
+| Feature         | How to Test                                                |
+| --------------- | ---------------------------------------------------------- |
+| Marketing pages | Visit `/`, `/pricing`                                      |
+| Authentication  | Sign up, sign in, sign out at `/sign-up`, `/sign-in`       |
+| Dashboard       | Access `/dashboard` after signing in                       |
+| Payments        | Click pricing button, complete Stripe checkout (test mode) |
+| Blog            | Visit `/blog` to see MDX content                           |
+
+---
+
+## Common Issues
+
+<AccordionGroup>
+<Accordion title="Auth redirect fails">
+**Check Supabase URL Configuration:**
+- Site URL: `http://localhost:3000` (exact match)
+- Redirect URLs: includes `http://localhost:3000/auth/callback`
+- Not using `127.0.0.1` (use `localhost` instead)
+</Accordion>
+
+<Accordion title="Stripe webhook errors">
+  **Ensure webhook listener is running:** ```bash stripe listen --forward-to
+  localhost:3000/api/webhooks/stripe ``` - Copy the `whsec_...` secret each time
+  you restart - Listener must be running when testing checkout
+</Accordion>
+
+<Accordion title="Database tables missing">
+  **Run migrations:** ```bash npx supabase db push ``` Or manually run SQL from
+  `supabase/migrations/` in Supabase SQL Editor.
+</Accordion>
+
+<Accordion title="Environment variables not loading">
+- Restart dev server after changing `.env.local`
+- `NEXT_PUBLIC_` prefix required for client-side variables
+- No spaces around `=` in env file
+</Accordion>
+</AccordionGroup>
+
+---
+
+## Next Steps
+
+<CardGroup cols={3}>
+  <Card title="Authentication" icon="lock" href="/authentication">
+    Configure OAuth and customize auth flows
+  </Card>
+  <Card title="Payments" icon="credit-card" href="/payments">
+    Set up Stripe products and pricing
+  </Card>
+  <Card title="Customization" icon="palette" href="/customization">
+    Brand the app with your logo and colors
+  </Card>
+</CardGroup>
