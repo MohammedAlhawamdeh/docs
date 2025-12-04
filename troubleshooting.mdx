@@ -13,91 +13,44 @@ Quick solutions to common issues when building with KwikSaaS.
 
 <AccordionGroup>
 <Accordion title="OAuth redirect fails or shows error">
-**Symptoms:**
-- Google/GitHub sign-in redirects to error page
-- Console shows CORS or redirect errors
-- "Invalid callback URL" message
+**Symptoms:** Google/GitHub sign-in redirects to error page, console shows CORS or redirect errors, "Invalid callback URL" message.
 
 **Solutions:**
 
-1. **Check Supabase URL Configuration:**
-   - Go to **Supabase Dashboard → Authentication → URL Configuration**
-   - Site URL: `http://localhost:3000` (exact match, no trailing slash)
-   - Redirect URLs: must include `http://localhost:3000/auth/callback`
+**Check Supabase URL Configuration:** Go to Supabase Dashboard → Authentication → URL Configuration. Site URL should be `http://localhost:3000` (exact match, no trailing slash). Redirect URLs must include `http://localhost:3000/auth/callback`.
 
-2. **Verify OAuth provider settings:**
-   - Callback URL in Google/GitHub matches Supabase's provided URL
-   - Client ID and Secret are correct
-   - Provider is enabled in Supabase
+**Verify OAuth provider settings:** Callback URL in Google/GitHub must match Supabase's provided URL. Client ID and Secret must be correct. Provider must be enabled in Supabase.
 
-3. **Use `localhost` not `127.0.0.1`:**
-   - Supabase treats these as different origins
-   - Always use `http://localhost:3000`
-     </Accordion>
+**Use localhost not 127.0.0.1:** Supabase treats these as different origins. Always use `http://localhost:3000`.
+
+</Accordion>
 
 <Accordion title="Email verification not arriving">
-**Symptoms:**
-- Sign up completes but no email received
-- Magic link never arrives
-- Password reset email missing
+**Symptoms:** Sign up completes but no email received, magic link never arrives, password reset email missing.
 
 **Solutions:**
 
-1. **Check spam/junk folder**
+Check spam/junk folder first. Supabase rate limits: Free tier allows 4 emails/hour - wait or upgrade plan. Verify email settings in Authentication → Email Templates. Check Supabase Auth logs in Dashboard → Logs → Auth Logs.
 
-2. **Supabase rate limits:**
-   - Free tier: 4 emails/hour
-   - Wait or upgrade plan
-
-3. **Verify email settings:**
-   - Go to **Authentication → Email Templates**
-   - Ensure templates are enabled
-   - Check SMTP settings if using Resend
-
-4. **Check Supabase Auth logs:**
-   - **Dashboard → Logs → Auth Logs**
-   - Look for email send errors
-     </Accordion>
+</Accordion>
 
 <Accordion title="Session not persisting after sign in">
-**Symptoms:**
-- User signs in but immediately logged out
-- Dashboard shows sign-in page
-- Session lost on page refresh
+**Symptoms:** User signs in but immediately logged out, dashboard shows sign-in page, session lost on page refresh.
 
 **Solutions:**
 
-1. **Check `NEXT_PUBLIC_SITE_URL`:**
-   - Must match the actual URL you're accessing
-   - Include protocol (`http://` or `https://`)
+Check `NEXT_PUBLIC_SITE_URL` matches the actual URL you're accessing (include protocol). Verify middleware is running - check `middleware.ts` matcher patterns. Try incognito mode to rule out cookie issues, or clear site data.
 
-2. **Verify middleware is running:**
-   - Check `middleware.ts` matcher patterns
-   - Ensure it's in the project root
+</Accordion>
 
-3. **Browser cookie issues:**
-   - Try incognito mode
-   - Check if cookies are blocked
-   - Clear site data and try again
-     </Accordion>
-
-<Accordion title="Password reset shows 'Invalid token' error">
-**Symptoms:**
-- Reset link shows error page
-- "Invalid or expired token" message
+<Accordion title="Password reset shows Invalid token error">
+**Symptoms:** Reset link shows error page, "Invalid or expired token" message.
 
 **Solutions:**
 
-1. **Token expiry:** Links expire after 24 hours. Request a new one.
+Token expiry: Links expire after 24 hours - request a new one. Check auth callback: `/auth/callback` must be in Supabase Redirect URLs. Recovery flow requires `type=recovery` in URL. The callback sets a recovery cookie - if blocked, reset flow fails.
 
-2. **Check auth callback:**
-   - `/auth/callback` must be in Supabase Redirect URLs
-   - Recovery flow requires `type=recovery` in URL
-
-3. **Recovery cookie:**
-   - The callback sets a recovery cookie
-   - If blocked, reset flow fails
-     </Accordion>
+</Accordion>
 </AccordionGroup>
 
 ---
@@ -106,95 +59,42 @@ Quick solutions to common issues when building with KwikSaaS.
 
 <AccordionGroup>
 <Accordion title="Checkout returns 400 error">
-**Symptoms:**
-- Clicking pricing button shows error
-- Console shows "Invalid price" or 400 status
+**Symptoms:** Clicking pricing button shows error, console shows "Invalid price" or 400 status.
 
 **Solutions:**
 
-1. **Verify price ID:**
-   - Check Stripe Dashboard for correct Price ID
-   - Ensure it starts with `price_`
-   - Match test/live mode
+Verify price ID in Stripe Dashboard - ensure it starts with `price_` and matches test/live mode. Check plan configuration in `src/lib/payments/plans.ts` has matching `stripePriceIds`. Stripe mode mismatch: test keys only work with test products.
 
-2. **Check plan configuration:**
-   - `src/lib/payments/plans.ts` has matching `stripePriceIds`
-   - Environment variable is set correctly
-
-3. **Stripe mode mismatch:**
-   - Test keys only work with test products
-   - Production keys only work with live products
-     </Accordion>
+</Accordion>
 
 <Accordion title="Webhook signature verification failed">
-**Symptoms:**
-- Stripe Dashboard shows failed webhooks
-- Console: "No signatures found matching"
-- Database not updating after payment
+**Symptoms:** Stripe Dashboard shows failed webhooks, console shows "No signatures found matching", database not updating after payment.
 
 **Solutions:**
 
-1. **For local development:**
-   - Restart `stripe listen` command
-   - Copy the new `whsec_...` secret
-   - Update `STRIPE_WEBHOOK_SECRET` in `.env.local`
-   - Restart dev server
+For local development: Restart `stripe listen` command, copy the new `whsec_...` secret, update `STRIPE_WEBHOOK_SECRET` in `.env.local`, restart dev server.
 
-2. **For production:**
-   - Go to **Stripe → Developers → Webhooks**
-   - Verify endpoint URL is correct
-   - Use the webhook's signing secret (not API key)
-   - Ensure endpoint is receiving events
-     </Accordion>
+For production: Go to Stripe → Developers → Webhooks, verify endpoint URL is correct, use the webhook's signing secret (not API key).
+
+</Accordion>
 
 <Accordion title="Subscription not appearing in database">
-**Symptoms:**
-- Payment successful in Stripe
-- User doesn't show as subscribed
-- `user_subscriptions` table empty
+**Symptoms:** Payment successful in Stripe, user doesn't show as subscribed, `user_subscriptions` table empty.
 
 **Solutions:**
 
-1. **Webhook listener running:**
+Ensure webhook listener is running: `stripe listen --forward-to localhost:3000/api/webhooks/stripe`. Check Stripe webhook logs in Developers → Webhooks → Recent events. Verify database migrations with `npx supabase db push`. Check server logs for errors in webhook handler.
 
-   ```bash
-   stripe listen --forward-to localhost:3000/api/webhooks/stripe
-   ```
-
-2. **Check Stripe webhook logs:**
-   - **Developers → Webhooks → Recent events**
-   - Look for failed deliveries
-   - Check response status codes
-
-3. **Verify database migrations:**
-   - Tables must exist: `user_subscriptions`, `one_time_purchases`
-   - Run `npx supabase db push` if missing
-
-4. **Check server logs:**
-   - Look for errors in webhook handler
-   - Verify Supabase service key is correct
-     </Accordion>
+</Accordion>
 
 <Accordion title="Customer portal not opening">
-**Symptoms:**
-- "Manage subscription" button doesn't work
-- Error creating portal session
+**Symptoms:** "Manage subscription" button doesn't work, error creating portal session.
 
 **Solutions:**
 
-1. **User needs Stripe customer ID:**
-   - Check `user_subscriptions` for `stripe_customer_id`
-   - Customer is created on first checkout
+User needs `stripe_customer_id` in `user_subscriptions` table - customer is created on first checkout. Enable portal in Stripe Settings → Billing → Customer portal. User must be authenticated - portal requires active session.
 
-2. **Enable portal in Stripe:**
-   - **Settings → Billing → Customer portal**
-   - Activate the portal
-   - Configure allowed actions
-
-3. **User must be authenticated:**
-   - Portal requires active session
-   - Sign in before accessing billing
-     </Accordion>
+</Accordion>
 </AccordionGroup>
 
 ---
@@ -203,120 +103,55 @@ Quick solutions to common issues when building with KwikSaaS.
 
 <AccordionGroup>
 <Accordion title="Tables missing after migration">
-**Symptoms:**
-- "relation does not exist" errors
-- Dashboard shows database errors
-- Can't insert/read data
+**Symptoms:** "relation does not exist" errors, dashboard shows database errors, can't insert/read data.
 
 **Solutions:**
 
-1. **Run migrations:**
+Run migrations: `npx supabase db push`. Or manually execute SQL from `supabase/migrations/*.sql` in Supabase SQL Editor. Check connection - verify `NEXT_PUBLIC_SUPABASE_URL` is correct and project is active (not paused).
 
-   ```bash
-   npx supabase db push
-   ```
-
-2. **Manual SQL execution:**
-   - Go to Supabase SQL Editor
-   - Copy contents of `supabase/migrations/*.sql`
-   - Run in order
-
-3. **Check connection:**
-   - Verify `NEXT_PUBLIC_SUPABASE_URL` is correct
-   - Ensure project is active (not paused)
-     </Accordion>
+</Accordion>
 
 <Accordion title="RLS policy blocking access">
-**Symptoms:**
-- Empty data returned from queries
-- "new row violates row-level security policy"
-- Works in Supabase dashboard but not app
+**Symptoms:** Empty data returned from queries, "new row violates row-level security policy", works in Supabase dashboard but not app.
 
 **Solutions:**
 
-1. **Check user authentication:**
-   - RLS requires authenticated session
-   - Verify user is signed in
+Check user authentication - RLS requires authenticated session. Use correct client: client-side uses anon key with RLS, server-side service key bypasses RLS. Review policies in Supabase → Authentication → Policies.
 
-2. **Use correct client:**
-   - Client-side: uses anon key with RLS
-   - Server-side: service key bypasses RLS
-
-3. **Review policies:**
-   - **Supabase → Authentication → Policies**
-   - Ensure policies allow the operation
-   - Check `auth.uid()` matches `user_id`
-     </Accordion>
+</Accordion>
 </AccordionGroup>
 
 ---
 
-## Build & Deploy Issues
+## Build and Deploy Issues
 
 <AccordionGroup>
 <Accordion title="Build fails with type errors">
-**Symptoms:**
-- `npm run build` fails
-- TypeScript errors in console
-- Deploy fails on Vercel
+**Symptoms:** `npm run build` fails, TypeScript errors in console, deploy fails on Vercel.
 
 **Solutions:**
 
-1. **Run type check locally:**
+Run type check locally: `npm run lint` and `npx tsc --noEmit`. Supabase types may need regeneration with `npx supabase gen types typescript`. Build may fail if env vars are missing - set all required vars in deployment platform.
 
-   ```bash
-   npm run lint
-   npx tsc --noEmit
-   ```
-
-2. **Check for missing types:**
-   - Supabase types may need regeneration
-   - Run `npx supabase gen types typescript`
-
-3. **Environment variables:**
-   - Build may fail if env vars are missing
-   - Set all required vars in deployment platform
-     </Accordion>
+</Accordion>
 
 <Accordion title="Environment variables not loading">
-**Symptoms:**
-- `undefined` values in app
-- Features not working in production
-- Works locally but not deployed
+**Symptoms:** `undefined` values in app, features not working in production, works locally but not deployed.
 
 **Solutions:**
 
-1. **Client-side variables:**
-   - Must start with `NEXT_PUBLIC_`
-   - Restart dev server after changes
+Client-side variables must start with `NEXT_PUBLIC_`. Restart dev server after changes. Server-side variables are available in API routes and server components. For Vercel: add all variables in dashboard and redeploy after adding new variables.
 
-2. **Server-side variables:**
-   - Available in API routes and server components
-   - Not exposed to browser
-
-3. **Vercel deployment:**
-   - Add all variables in Vercel dashboard
-   - Redeploy after adding new variables
-     </Accordion>
+</Accordion>
 
 <Accordion title="Vercel deployment shows old code">
-**Symptoms:**
-- Changes not appearing after deploy
-- Vercel shows successful but outdated
+**Symptoms:** Changes not appearing after deploy, Vercel shows successful but outdated.
 
 **Solutions:**
 
-1. **Clear Vercel cache:**
-   - Trigger new deployment with "Redeploy" → Clear cache
+Clear Vercel cache by triggering new deployment with "Redeploy" → Clear cache. Check you're deploying the correct branch. Review build logs for errors.
 
-2. **Check branch:**
-   - Verify deploying correct branch
-   - Check Vercel's git integration settings
-
-3. **Build output:**
-   - Review build logs for errors
-   - Check if expected files are generated
-     </Accordion>
+</Accordion>
 </AccordionGroup>
 
 ---
@@ -325,74 +160,31 @@ Quick solutions to common issues when building with KwikSaaS.
 
 <AccordionGroup>
 <Accordion title="Hot reload not working">
-**Symptoms:**
-- Changes require manual refresh
-- Fast refresh errors in console
+**Symptoms:** Changes require manual refresh, fast refresh errors in console.
 
 **Solutions:**
 
-1. **Check for syntax errors:**
-   - Errors can break hot reload
-   - Fix errors and save again
+Check for syntax errors - they can break hot reload. Restart dev server with `npm run dev`. Clear Next.js cache: `rm -rf .next && npm run dev`.
 
-2. **Restart dev server:**
-
-   ```bash
-   # Stop current server (Ctrl+C)
-   npm run dev
-   ```
-
-3. **Clear Next.js cache:**
-   ```bash
-   rm -rf .next
-   npm run dev
-   ```
-   </Accordion>
+</Accordion>
 
 <Accordion title="Tailwind styles not applying">
-**Symptoms:**
-- Classes have no effect
-- Styles work locally but not in production
+**Symptoms:** Classes have no effect, styles work locally but not in production.
 
 **Solutions:**
 
-1. **Check content configuration:**
-   - Tailwind must scan the right files
-   - Verify `tailwind.config.ts` content array
+Check content configuration in `tailwind.config.ts`. Use full class names (not computed). Use `cn()` helper for conditional classes. Clear cache: `rm -rf .next && npm run dev`.
 
-2. **Dynamic class names:**
-   - Full class names required (not computed)
-   - Use `cn()` helper for conditional classes
-
-3. **Clear cache:**
-   ```bash
-   rm -rf .next
-   npm run dev
-   ```
-   </Accordion>
+</Accordion>
 
 <Accordion title="Module not found errors">
-**Symptoms:**
-- Import errors in console
-- "Cannot find module" messages
+**Symptoms:** Import errors in console, "Cannot find module" messages.
 
 **Solutions:**
 
-1. **Reinstall dependencies:**
+Reinstall dependencies: `rm -rf node_modules && npm install`. Check path aliases - imports should use `@/` prefix. Verify `tsconfig.json` paths. Note that Linux/macOS are case-sensitive.
 
-   ```bash
-   rm -rf node_modules
-   npm install
-   ```
-
-2. **Check path aliases:**
-   - Imports should use `@/` prefix
-   - Verify `tsconfig.json` paths
-
-3. **Case sensitivity:**
-   - Linux/macOS are case-sensitive
-   - Match exact file/folder casing
-     </Accordion>
+</Accordion>
 </AccordionGroup>
 
 ---
@@ -401,45 +193,22 @@ Quick solutions to common issues when building with KwikSaaS.
 
 <AccordionGroup>
 <Accordion title="Resend emails not sending">
-**Symptoms:**
-- No emails received from app
-- Resend dashboard shows no activity
+**Symptoms:** No emails received from app, Resend dashboard shows no activity.
 
 **Solutions:**
 
-1. **Check API key:**
-   - `RESEND_API_KEY` must start with `re_`
-   - Key must have send permissions
+Check API key - `RESEND_API_KEY` must start with `re_`. Domain must be verified in Resend with DNS records (SPF, DKIM). `RESEND_FROM_EMAIL` must use verified domain or `@resend.dev` for testing.
 
-2. **Verify domain:**
-   - Domain must be verified in Resend
-   - Check DNS records (SPF, DKIM)
-
-3. **From address:**
-   - `RESEND_FROM_EMAIL` must use verified domain
-   - Or use `@resend.dev` for testing
-     </Accordion>
+</Accordion>
 
 <Accordion title="Emails landing in spam">
-**Symptoms:**
-- Emails sent but go to spam
-- Low deliverability
+**Symptoms:** Emails sent but go to spam, low deliverability.
 
 **Solutions:**
 
-1. **Complete domain verification:**
-   - Add all DNS records (SPF, DKIM, DMARC)
-   - Wait for propagation (up to 48 hours)
+Complete domain verification with all DNS records (SPF, DKIM, DMARC) - wait up to 48 hours for propagation. Avoid spam triggers: no all caps in subject, include unsubscribe link. Use custom domain instead of `@resend.dev` in production.
 
-2. **Avoid spam triggers:**
-   - Don't use all caps in subject
-   - Include unsubscribe link
-   - Balance text and images
-
-3. **Use custom domain:**
-   - Don't use `@resend.dev` in production
-   - Set up your own verified domain
-     </Accordion>
+</Accordion>
 </AccordionGroup>
 
 ---
@@ -464,7 +233,7 @@ Quick solutions to common issues when building with KwikSaaS.
 </CardGroup>
 
 <Tip>
-  When reporting issues, include: - Error messages (full text) - Steps to
-  reproduce - Environment (local/production) - Relevant environment variables
-  (without secrets)
+  When reporting issues, include: error messages (full text), steps to
+  reproduce, environment (local/production), and relevant environment variables
+  (without secrets).
 </Tip>
